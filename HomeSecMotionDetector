@@ -1,0 +1,66 @@
+int inputPin = D4;              
+int ledPin = D7;                
+int pirState = LOW;             
+int val = 0;
+int ledout = D6;
+int calibrateTime = 10000;      
+
+void setup()
+    {
+        pinMode( ledPin, OUTPUT );
+        pinMode(inputPin, INPUT);   
+        pinMode(ledout, OUTPUT);
+        digitalWrite(ledout, LOW);
+        Particle.subscribe("Received", myHandler, "e00fce68641e3d4016d2c09e");
+    }
+
+void loop()
+    {
+        if ( calibrated() )
+            {
+               readTheSensor();
+               reportTheData();
+            }
+    }
+
+void readTheSensor() 
+    {
+        val = digitalRead(inputPin);
+    }
+
+bool calibrated() 
+    {
+        return millis() - calibrateTime > 0;
+    }
+
+void reportTheData() 
+    {
+        if (val == HIGH) 
+            {
+                Particle.publish("Motion_alert", "1"); 
+                pirState = HIGH;
+                setLED( pirState );
+                digitalWrite(ledout, HIGH);
+                delay(10000);
+            } 
+            
+        else 
+            {   Particle.publish("Motion_alert","0");
+                pirState = LOW;
+                digitalWrite(ledout, LOW);
+                setLED( pirState );
+                delay(10000);
+            }
+    }
+
+void setLED( int state )
+    {
+        digitalWrite( ledPin, state );
+    }
+
+void myHandler(const char *event, const char *data)
+    {
+        digitalWrite(ledout, HIGH);
+        delay(5000);
+        digitalWrite(ledout, LOW);
+    }
