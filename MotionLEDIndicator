@@ -1,0 +1,25 @@
+int led = D7;
+
+
+
+void setup() {
+
+pinMode(led, OUTPUT);
+digitalWrite(led, LOW);
+
+Particle.subscribe("Motion_alert", myHandler, "e00fce68e3c7c823bac7871c");
+
+
+}
+
+void myHandler(const char *event, const char *data)
+{
+if (strcmp(data,"1")==0) {
+  digitalWrite(led, HIGH);
+  Particle.publish("Received","1");
+
+  }else if (strcmp(data,"0")==0) {
+      digitalWrite(led, LOW);
+
+  
+}}
